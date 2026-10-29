@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "mr-kodex-Maneger-Mostafa",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "MR-Mostafa-maneger",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "com.qaysar.platform"
+}
