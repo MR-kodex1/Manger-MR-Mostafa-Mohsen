@@ -10,15 +10,15 @@
   "id": "com.qaysar.platform",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "1.jpeg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "icon.png",
+      "src": "1.jpeg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]
