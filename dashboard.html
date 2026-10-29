@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدرس | منصة القيصر</title>
+    <!-- استدعاء الخطوط والأيقونات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- استدعاء ملف الـ CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <h2><i class="fa-solid fa-crown"></i> القيصر</h2>
+            <p>لوحة تحكم المدرس</p>
+        </div>
+        <ul>
+            <li><a onclick="switchTab('add-lesson', this); closeMenu();" class="active"><i class="fa-solid fa-plus-circle"></i> إضافة درس جديد</a></li>
+            <li><a onclick="switchTab('manage-lessons', this); closeMenu();"><i class="fa-solid fa-book"></i> إدارة المواد</a></li>
+            <li><a onclick="switchTab('manage-reviews', this); closeMenu();"><i class="fa-solid fa-star"></i> إدارة التقييمات</a></li>
+            <li><a onclick="switchTab('students', this); closeMenu();"><i class="fa-solid fa-users"></i> الطلاب</a></li>
+            <li><a onclick="switchTab('statistics', this); closeMenu();"><i class="fa-solid fa-chart-simple"></i> الإحصائيات</a></li>
+            <li style="margin-top: auto;"><a onclick="logout()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</a></li>
+        </ul>
+    </div>
+
+    <!-- طبقة التغطية -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <div class="topbar">
+            <!-- زرار القائمة -->
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <h2 id="pageTitle">إضافة درس جديد</h2>
+
+            <div class="user-info">
+                <div>
+                    <h4>MR-Mostafa Mohsen</h4>
+                    <p>مدرس</p>
+                </div>
+                <img src="1.jpeg" alt="User">
+            </div>
+        </div>
+
+        <div class="workspace">
+            <!-- 1. قسم إضافة درس -->
+            <div id="add-lesson" class="tab-section active">
+                <div class="add-card">
+                    <h2><i class="fa-solid fa-gift"></i> إضافة محتوى جديد للطلاب</h2>
+
+                    <div class="step">
+                        <div class="step-title"><span>1</span> اختر المرحلة الدراسية</div>
+                        <div class="radio-group">
+                            <label class="radio-card active" onclick="selectStage(this, 'ثانوية عامة')">
+                                <input type="radio" name="stage" value="ثانوية عامة" checked>
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                <h4>الثانوية العامة</h4>
+                                <p>(بلاغة - نحو - أدب - المتحرر)</p>
+                            </label>
+                            <label class="radio-card" onclick="selectStage(this, 'بكالوريا')">
+                                <input type="radio" name="stage" value="بكالوريا">
+                                <i class="fa-solid fa-book"></i>
+                                <h4>البكالوريا</h4>
+                                <p>(مستويات ووحدات)</p>
+                            </label>
+                            <label class="radio-card" onclick="selectStage(this, 'التقييمات')">
+                                <input type="radio" name="stage" value="التقييمات">
+                                <i class="fa-solid fa-star"></i>
+                                <h4>التقييمات</h4>
+                                <p>(6 وحدات)</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-title"><span>2</span> اختر المادة والدرس</div>
+                        <div class="input-group">
+                            <label>اختر المادة / القسم</label>
+                            <select id="subjectSelect" onchange="updateLessonsList()"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>اختر الدرس</label>
+                            <select id="lessonSelect">
+                                <option value="">-- اختر الدرس --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-title"><span>3</span> أضف الرابط أو الملف</div>
+                        <div class="input-group">
+                            <label>رابط الفيديو (YouTube) - اختياري</label>
+                            <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                        <div class="input-group">
+                            <label>رابط ملف PDF (Google Drive) - اختياري</label>
+                            <input type="text" id="pdfUrl" placeholder="https://drive.google.com/file/d/...">
+                        </div>
+                    </div>
+
+                    <button class="btn-submit" onclick="saveContent()"><i class="fa-solid fa-cloud-arrow-up"></i> حفظ ونشر الدرس</button>
+                    <p id="status" class="status-msg"></p>
+                </div>
+            </div>
+
+            <!-- 2. قسم إدارة المواد -->
+            <div id="manage-lessons" class="tab-section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المرحلة</th>
+                                <th>المادة</th>
+                                <th>الدرس</th>
+                                <th>الفيديو</th>
+                                <th>الملف</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lessonsTableBody">
+                            <tr><td colspan="6" style="text-align:center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. قسم إدارة التقييمات -->
+            <div id="manage-reviews" class="tab-section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الوحدة</th>
+                                <th>التقييم</th>
+                                <th>الفيديو</th>
+                                <th>الملف</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <tr><td colspan="5" style="text-align:center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. قسم الطلاب -->
+            <div id="students" class="tab-section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم الطالب</th>
+                                <th>كود الطالب (الموبايل)</th>
+                                <th>المرحلة</th>
+                                <th>تاريخ التسجيل</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <tr><td colspan="4" style="text-align:center;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. قسم الإحصائيات -->
+            <div id="statistics" class="tab-section">
+                <div class="stats-grid">
+                    <div class="stat-card"><i class="fa-solid fa-users"></i><h3 id="totalStudents">0</h3><p>إجمالي الطلاب</p></div>
+                    <div class="stat-card"><i class="fa-solid fa-video"></i><h3 id="totalLessons">0</h3><p>الدروس المرفوعة</p></div>
+                    <div class="stat-card"><i class="fa-solid fa-file-pdf"></i><h3 id="totalPdfs">0</h3><p>ملفات PDF</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ملف السوبابيز والسكريبت -->
+    <script src="supabase.js"></script>
+    <script>
+        // ... (نفس كود الجافاسكريبت اللي أنت بعتهولي بالظبط، مفيش تغيير فيه) ...
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+        }
+
+        function closeMenu() {
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMenu);
+        }
+
+        if (localStorage.getItem("is_admin") !== "true") { window.location.href = "index.html"; }
+        function logout() { localStorage.removeItem("is_admin"); window.location.href = "index.html"; }
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.sidebar ul li a').forEach(a => a.classList.remove('active'));
+            if (element) element.classList.add('active');
+            const titles = {
+                'add-lesson': 'إضافة درس جديد',
+                'manage-lessons': 'إدارة المواد والدروس',
+                'manage-reviews': 'إدارة التقييمات',
+                'students': 'قائمة الطلاب',
+                'statistics': 'الإحصائيات العامة'
+            };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+            if (tabId === 'manage-lessons') loadLessonsTable();
+            if (tabId === 'manage-reviews') loadReviewsTable();
+            if (tabId === 'students') loadStudentsTable();
+            if (tabId === 'statistics') loadStatistics();
+        }
+
+        let selectedStage = "ثانوية عامة";
+        const lessonsData = {
+            "ثانوية عامة": {
+                "النحو": ["همزة القطع وألف الوصل", "اللام الشمسية واللام القمرية", "التاء المفتوحة والتاء المربوطة والهاء", "كتابة الهمزة المتوسطة", "كتابة الهمزة المتطرفة", "الواو آخر الكلمة", "تدريبات على دروس الوحدة", "اسم الفاعل", "صيغ المبالغة", "اسم المفعول", "اسم التفضيل", "اسم الزمان والمكان", "اسم الآلة", "المصدر الصريح (السماعي والقياسي)", "المصدر المؤول", "اسم المرة واسم الهيئة", "الاسم المقصور", "الاسم المنقوص", "الاسم الممدود", "بناء الفعل للمجهول", "أشهر الأفعال اللازمة للبناء للمجهول", "المبتدأ والخبر", "أفعال الناسخ", "كان وأخواتها", "كاد وأخواتها", "الحروف الناسخة", "إن وأخواتها", "لا النافية للجنس", "الجمل التي لها محل من الإعراب", "الجمل التي لا محل لها من الإعراب", "الضمائر", "التوكيد", "المفعول به", "المفعول المطلق وما ينوب عنه", "المفعول لأجله", "المفعول معه", "الأفعال المبنية", "الفعل المعرب", "رفع المضارع", "نصب الفعل المضارع", "جزم الفعل المضارع في جواب الطلب", "توكيد الفعل بالنون", "الفاعل", "تأنيث الفعل مع الفاعل", "نائب الفاعل", "كم الاستفهامية والخبرية", "حروف الجر", "المنادى", "أنواع (ما - من - لا)", "تدريبات على الممنوع من الصرف", "أبواب مكملة للمنهج", "الاختصاص", "المدح والذم", "الإغراء والتحذير", "التعجب", "النعت", "البدل", "العطف", "أسماء الأفعال", "الملحقات"],
+                "البلاغة": ["علم البيان", "علم البديع", "علم المعاني", "التجربة الشعرية", "الوحدة العضوية"],
+                "الأدب": ["الكلاسيكية", "الاتجاه الوجداني", "الديوان", "أبولو", "المهاجر", "الواقعية", "المقال", "الرواية", "القصة القصيرة", "المسرحية"],
+                "التعبير": ["شرح مهارات التعبير", "تدريبات على مهارات التعبير", "تدريبات على مهارات التعبير الإبداعي"],
+                "المتحرر": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث", "الدرس الرابع", "الدرس الخامس"]
+            },
+            "بكالوريا": {
+                "الوحدة الأولى": ["العلم بين القانون والضمير", "الخلق جوهر الفضيلة", "العلم نور", "الأسماء الخمسة", "أساليب الإنشاء", "التاء المربوطة والهاء والتاء المبسوطة"],
+                "الوحدة الثانية": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث"],
+                "الوحدة الثالثة": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث"],
+                "الوحدة الرابعة": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث"],
+                "الوحدة الخامسة": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث"],
+                "الوحدة السادسة": ["الدرس الأول", "الدرس الثاني", "الدرس الثالث"]
+            },
+            "التقييمات": {
+                "الوحدة الأولى": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"],
+                "الوحدة الثانية": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"],
+                "الوحدة الثالثة": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"],
+                "الوحدة الرابعة": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"],
+                "الوحدة الخامسة": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"],
+                "الوحدة السادسة": ["التقييم الأول", "التقييم الثاني", "التقييم الثالث", "التقييم الرابع", "التقييم الخامس"]
+            }
+        };
+
+        function selectStage(el, stage) {
+            document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedStage = stage;
+            updateSubjectsList();
+        }
+
+        function updateSubjectsList() {
+            const subjectSelect = document.getElementById("subjectSelect");
+            subjectSelect.innerHTML = "";
+            const items = Object.keys(lessonsData[selectedStage]);
+            items.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item;
+                option.textContent = item;
+                subjectSelect.appendChild(option);
+            });
+            updateLessonsList();
+        }
+
+        function updateLessonsList() {
+            const subject = document.getElementById("subjectSelect").value;
+            const lessonSelect = document.getElementById("lessonSelect");
+            lessonSelect.innerHTML = '<option value="">-- اختر الدرس --</option>';
+            if (lessonsData[selectedStage] && lessonsData[selectedStage][subject]) {
+                lessonsData[selectedStage][subject].forEach(lesson => {
+                    const option = document.createElement("option");
+                    option.value = lesson;
+                    option.textContent = lesson;
+                    lessonSelect.appendChild(option);
+                });
+            }
+        }
+
+        async function saveContent() {
+            const status = document.getElementById("status");
+            status.className = "status-msg";
+            status.style.display = "none";
+            const supabase = window.supabaseClient;
+            if (!supabase) { status.textContent = "خطأ في الاتصال!"; status.classList.add("error"); return; }
+
+            const subject = document.getElementById("subjectSelect").value;
+            const lesson_name = document.getElementById("lessonSelect").value;
+            let video_url = document.getElementById("videoUrl").value.trim() || null;
+            let pdf_url = document.getElementById("pdfUrl").value.trim() || null;
+
+            if (video_url) {
+                if (video_url.includes("youtu.be/")) {
+                    video_url = "https://www.youtube.com/embed/" + video_url.split("youtu.be/")[1].split("?")[0];
+                } else if (video_url.includes("watch?v=")) {
+                    video_url = "https://www.youtube.com/embed/" + video_url.split("watch?v=")[1].split("&")[0];
+                }
+            }
+
+            if (!lesson_name) { status.textContent = "من فضلك اختر الدرس!"; status.classList.add("error"); return; }
+
+            status.textContent = "جاري الحفظ...";
+            status.style.color = "var(--gold)";
+            status.style.display = "block";
+
+            const { data, error } = await supabase.from('lessons_content').upsert({
+                stage: selectedStage,
+                subject: subject,
+                lesson_name: lesson_name,
+                video_url: video_url,
+                pdf_url: pdf_url
+            }, { onConflict: 'stage, subject, lesson_name' });
+
+            if (error) {
+                status.textContent = "حدث خطأ: " + error.message;
+                status.className = "status-msg error";
+            } else {
+                status.textContent = "✅ تم الحفظ بنجاح!";
+                status.className = "status-msg success";
+                document.getElementById("videoUrl").value = "";
+                document.getElementById("pdfUrl").value = "";
+            }
+        }
+
+        async function loadLessonsTable() {
+            const tbody = document.getElementById('lessonsTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">جاري التحميل...</td></tr>';
+            const supabase = window.supabaseClient;
+            if (!supabase) return;
+
+            const { data, error } = await supabase.from('lessons_content').select('*').in('stage', ['ثانوية عامة', 'بكالوريا']).order('id', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">خطأ: ${error.message}</td></tr>`;
+                return;
+            }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد دروس مضافة بعد.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            data.forEach(lesson => {
+                const tr = document.createElement('tr');
+
+                const tdStage = document.createElement('td');
+                tdStage.textContent = lesson.stage || '';
+                tr.appendChild(tdStage);
+
+                const tdSubject = document.createElement('td');
+                tdSubject.textContent = lesson.subject || '';
+                tr.appendChild(tdSubject);
+
+                const tdLesson = document.createElement('td');
+                tdLesson.textContent = lesson.lesson_name || '';
+                tr.appendChild(tdLesson);
+
+                const tdVideo = document.createElement('td');
+                if (lesson.video_url) {
+                    tdVideo.innerHTML = '<i class="fa-solid fa-check" style="color:#4ade80"></i> متاح';
+                } else {
+                    tdVideo.textContent = 'لا يوجد';
+                }
+                tr.appendChild(tdVideo);
+
+                const tdPdf = document.createElement('td');
+                if (lesson.pdf_url) {
+                    tdPdf.innerHTML = '<i class="fa-solid fa-check" style="color:#4ade80"></i> متاح';
+                } else {
+                    tdPdf.textContent = 'لا يوجد';
+                }
+                tr.appendChild(tdPdf);
+
+                const tdAction = document.createElement('td');
+                const btn = document.createElement('button');
+                btn.className = 'btn-delete';
+                btn.innerHTML = '<i class="fa-solid fa-trash"></i> مسح';
+                btn.onclick = function() { deleteLesson(lesson.id); };
+                tdAction.appendChild(btn);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadReviewsTable() {
+            const tbody = document.getElementById('reviewsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">جاري التحميل...</td></tr>';
+            const supabase = window.supabaseClient;
+            if (!supabase) return;
+
+            const { data, error } = await supabase.from('lessons_content').select('*').eq('stage', 'التقييمات').order('id', { ascending: false });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">خطأ: ${error.message}</td></tr>`;
+                return;
+            }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">لا توجد تقييمات مضافة بعد.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            data.forEach(review => {
+                const tr = document.createElement('tr');
+
+                const tdSubject = document.createElement('td');
+                tdSubject.textContent = review.subject || '';
+                tr.appendChild(tdSubject);
+
+                const tdLesson = document.createElement('td');
+                tdLesson.textContent = review.lesson_name || '';
+                tr.appendChild(tdLesson);
+
+                const tdVideo = document.createElement('td');
+                if (review.video_url) {
+                    tdVideo.innerHTML = '<i class="fa-solid fa-check" style="color:#4ade80"></i> متاح';
+                } else {
+                    tdVideo.textContent = 'لا يوجد';
+                }
+                tr.appendChild(tdVideo);
+
+                const tdPdf = document.createElement('td');
+                if (review.pdf_url) {
+                    tdPdf.innerHTML = '<i class="fa-solid fa-check" style="color:#4ade80"></i> متاح';
+                } else {
+                    tdPdf.textContent = 'لا يوجد';
+                }
+                tr.appendChild(tdPdf);
+
+                const tdAction = document.createElement('td');
+                const btn = document.createElement('button');
+                btn.className = 'btn-delete';
+                btn.innerHTML = '<i class="fa-solid fa-trash"></i> مسح';
+                btn.onclick = function() { deleteLesson(review.id); };
+                tdAction.appendChild(btn);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deleteLesson(id) {
+            if (!confirm("هل أنت متأكد من مسح هذا المحتوى؟")) return;
+            const supabase = window.supabaseClient;
+            if (!supabase) { alert("خطأ في الاتصال بالسيرفر"); return; }
+
+            const { error } = await supabase.from('lessons_content').delete().eq('id', id);
+
+            if (error) {
+                console.error("خطأ في المسح:", error);
+                alert("حدث خطأ أثناء المسح:\n" + error.message);
+            } else {
+                alert("✅ تم المسح بنجاح!");
+
+                if (document.getElementById('manage-lessons').classList.contains('active')) {
+                    loadLessonsTable();
+                } else if (document.getElementById('manage-reviews').classList.contains('active')) {
+                    loadReviewsTable();
+                }
+            }
+        }
+
+        async function loadStudentsTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">جاري التحميل...</td></tr>';
+            const supabase = window.supabaseClient;
+            if (!supabase) return;
+            const { data, error } = await supabase.from('profiles').select('*');
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">خطأ: ${error.message}</td></tr>`;
+                return;
+            }
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا يوجد طلاب مسجلين.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            data.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${student.username || 'غير معروف'}</td><td>${student.phone || '---'}</td><td>${student.education_system || '---'}</td><td>${student.created_at ? new Date(student.created_at).toLocaleDateString('ar-EG') : '---'}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadStatistics() {
+            const supabase = window.supabaseClient; if (!supabase) return;
+            const { count: studentsCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+            document.getElementById('totalStudents').innerText = studentsCount || 0;
+            const { data: lessons } = await supabase.from('lessons_content').select('*');
+            if (lessons) {
+                document.getElementById('totalLessons').innerText = lessons.filter(l => l.stage !== 'التقييمات').length;
+                const pdfs = lessons.filter(l => l.pdf_url !== null).length;
+                document.getElementById('totalPdfs').innerText = pdfs;
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            updateSubjectsList();
+        });
+    </script>
+</body>
+
+</html>
