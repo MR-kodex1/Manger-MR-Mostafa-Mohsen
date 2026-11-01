@@ -101,8 +101,8 @@
                     <div class="step">
                         <div class="step-title"><span>3</span> أضف الرابط أو الملف</div>
                         <div class="input-group">
-                            <label>رابط الفيديو (YouTube) - اختياري</label>
-                            <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            <label>رابط الفيديو (YouTube أو Facebook) - اختياري</label>
+                            <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=... أو https://www.facebook.com/...">
                         </div>
                         <div class="input-group">
                             <label>رابط ملف PDF (Google Drive) - اختياري</label>
@@ -305,11 +305,20 @@
             let video_url = document.getElementById("videoUrl").value.trim() || null;
             let pdf_url = document.getElementById("pdfUrl").value.trim() || null;
 
+            // ==========================================
+            // تحويل روابط الفيديو (يوتيوب وفيسبوك)
+            // ==========================================
             if (video_url) {
+                // 1. روابط يوتيوب
                 if (video_url.includes("youtu.be/")) {
                     video_url = "https://www.youtube.com/embed/" + video_url.split("youtu.be/")[1].split("?")[0];
                 } else if (video_url.includes("watch?v=")) {
                     video_url = "https://www.youtube.com/embed/" + video_url.split("watch?v=")[1].split("&")[0];
+                } 
+                // 2. روابط فيسبوك (فيديو)
+                else if (video_url.includes("facebook.com")) {
+                    // بنحول الرابط لصيغة الـ Embed بتاعة فيسبوك
+                    video_url = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(video_url) + "&show_text=0&width=560";
                 }
             }
 
@@ -515,4 +524,4 @@
     </script>
 </body>
 
-</html>
+    </html>
